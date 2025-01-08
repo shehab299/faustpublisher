@@ -1,5 +1,5 @@
 import { execSync } from 'child_process';
-import { isPath, mkPath, clearDirectory } from '../utils/files.util.js';
+import { isPath, mkPath, clearDirectory } from '../utils/filesUtils.js';
 import { Errors } from '@oclif/core';
 
 function run(command) {
@@ -11,7 +11,6 @@ function run(command) {
     }
 }
 
-
 function getRegistryDefaultBranch(git) {
     return process.env.DEFAULT_BRANCH || 'main';
 }
@@ -21,7 +20,7 @@ function gitCmd(registryPath) {
 }
 
 function updateRegistry(git, registryPath, registryUrl) {
-    
+
     if (!isPath(registryPath)) {
         run(`git clone -q --depth=1 ${registryUrl} ${registryPath}`);
     } else {
@@ -45,18 +44,17 @@ function publishPackage(git, newVersion, branchName) {
     run(`${git} push origin ${branchName}`);
 }
 
-
 function switchToNewBranch(git, branchName) {
     run(`${git} checkout -b ${branchName}`);
 }
 
 function downloadPackage(pkgRepo, packageName, downloadsFolder) {
 
-    if(isPath(downloadsFolder))
+    if (isPath(downloadsFolder))
         clearDirectory(downloadsFolder);
 
     mkPath(downloadsFolder);
-    
+
     const pkgFolder = `${downloadsFolder}/${packageName}`;
 
     run(`git clone --depth=1 ${pkgRepo} ${pkgFolder}`);

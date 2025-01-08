@@ -3,8 +3,7 @@ import { Octokit } from "@octokit/core";
 import { promises } from "dns";
 import fs from 'fs/promises';
 
-async function checkToken(filepath) : Promise<boolean>
-{
+async function checkToken(filepath): Promise<boolean> {
 
     let user = await parseFile(filepath);
     let valid = false;
@@ -16,16 +15,13 @@ async function checkToken(filepath) : Promise<boolean>
     return valid;
 }
 
-
-export async function getToken(filepath) : Promise<string>
-{
-    if(!await checkToken(filepath))
+export async function getToken(filepath): Promise<string> {
+    if (!await checkToken(filepath))
         throw new Errors.CLIError("You are not logged in, please login first");
 
     let user = await parseFile(filepath);
     return user.token;
 }
-
 
 async function parseFile(filepath: string): Promise<{ token: string }> {
     try {
@@ -34,8 +30,6 @@ async function parseFile(filepath: string): Promise<{ token: string }> {
         return { token: '' };
     }
 }
-
-
 
 async function validateToken(token: string): Promise<boolean> {
     try {

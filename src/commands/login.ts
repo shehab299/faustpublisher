@@ -1,9 +1,8 @@
 import { Command, Errors } from "@oclif/core";
-import getCreditsPath, {createFaustDir} from "../utils/credits_path.util.js";
+import getCreditsPath, { createFaustDir } from "../utils/creditsPathUtils.js";
 import fs from 'fs/promises';
-import auth from "../utils/auth.util.js";
-import checkToken from "../utils/checkToken.util.js";
-
+import auth from "../utils/authUtils.js";
+import checkToken from "../utils/checkTokenUtils.js";
 
 class Login extends Command {
     static description: string = "Login to your GitHub account";
@@ -11,7 +10,6 @@ class Login extends Command {
     static examples: string[] = [
         `$ faustpublisher login`,
     ];
-
 
     async login(): Promise<string> {
         try {
@@ -32,8 +30,7 @@ class Login extends Command {
         }
     }
 
-
-    async run() : Promise<void> {
+    async run(): Promise<void> {
 
         createFaustDir();
 

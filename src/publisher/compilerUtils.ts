@@ -1,25 +1,24 @@
 import { spawn } from 'child_process';
 import path from 'path';
-import { isPath } from '../utils/files.util.js';
+import { isPath } from '../utils/filesUtils.js';
 import fs from 'fs/promises'
 import { Errors } from '@oclif/core';
 
-class FaustCompiler
-{
+class FaustCompiler {
 
     faustPath
 
-    constructor(filePath = "faust"){
-        this.faustPath = filePath; 
+    constructor(filePath = "faust") {
+        this.faustPath = filePath;
     }
 
-    compileAsync(file, toJson, entry_point) : Promise<string> {
+    compileAsync(file, toJson, entry_point): Promise<string> {
 
         return new Promise((resolve, reject) => {
 
             let options = [file, '-po', '-pn', entry_point];
-            
-            if(toJson){
+
+            if (toJson) {
                 options.push("-json")
             }
 
@@ -34,9 +33,9 @@ class FaustCompiler
             });
 
             faust.on('close', (code) => {
-                if(code === 0){
+                if (code === 0) {
                     resolve("Testing Completed Successfully");
-                }else{
+                } else {
                     reject("The package didn't compile successfully!");
                 }
             });
@@ -45,8 +44,7 @@ class FaustCompiler
 
 };
 
-
-async function getVersion(file) : Promise<string> {
+async function getVersion(file): Promise<string> {
 
     let version = '';
 
@@ -54,7 +52,7 @@ async function getVersion(file) : Promise<string> {
     const d = JSON.parse(data);
 
     d.meta?.forEach((ob) => {
-        if(ob.version)
+        if (ob.version)
             version = ob.version;
     })
 
@@ -62,7 +60,7 @@ async function getVersion(file) : Promise<string> {
 }
 
 async function compilePackage(pkgFolder, packageName) {
-    
+
     const compiler = new FaustCompiler();
     const mainfilePath = path.join(pkgFolder, packageName);
     const jsonFilePath = path.join(pkgFolder, packageName + ".json");
@@ -77,18 +75,18 @@ async function compilePackage(pkgFolder, packageName) {
         throw new Errors.CLIError("The package you are trying to publish doesn't have a main file");
     }
 
-    try{
+    try {
         await compiler.compileAsync(mainfilePath, true, entry_point);
-    }catch(error){
+    } catch (error) {
         throw new Errors.CLIError(error);
     }
-    
+
     let version = await getVersion(jsonFilePath);
 
-    if(!version || version === ''){
+    if (!version || version === '') {
         throw new Errors.CLIError("The Package Doesn't Hava A Declared Version");
     }
-    
+
     await fs.rm(jsonFilePath);
 
     return {
@@ -97,6 +95,6 @@ async function compilePackage(pkgFolder, packageName) {
     }
 }
 
-export {compilePackage};
+export { compilePackage };
 
 

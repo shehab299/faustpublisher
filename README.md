@@ -8,18 +8,19 @@ The Faust Publisher CLI simplifies the process of publishing Faust packages to t
 
 The Faust community, being small due to Faust's domain-specific nature, requires a simple publishing workflow. This is facilitated by the `faustpublisher` CLI tool.
 
-### **Prerequisites:**
+### Prerequisites:
+
 - **Faust with Package Support:** Ensure Faust is installed with package support.
 - **npm (Node Package Manager):** Required to install the `faustpublisher` CLI tool.
 
-### **Installing the Publisher:**
+### Installing the Publisher:
 
 Install `faustpublisher` globally using npm:
 ```bash
 npm install -g faustpublisher
 ```
 
-### **Logging In:**
+### Logging In:
 
 Authenticate before publishing:
 ```bash
@@ -28,14 +29,15 @@ faustpublisher login
 - If you're already logged in, you'll receive a notification.
 - If not, follow the provided link and code for authorization.
 
-### **Publishing a Library:**
+### Publishing a Library:
 
 To publish your library, use:
 ```bash
 faustpublisher publish <github_repo_link>
 ```
 
-### **Repository Requirements for Successful Publishing:**
+### Repository Requirements for Successful Publishing:
+
 - **Collaborator Status:** You must be a collaborator of the repository.
 - **Repository Name:** Must match the library name and end with `.lib`.
 - **Library Location:** The library file should be in the root of the repository.
@@ -50,8 +52,10 @@ faustpublisher publish <github_repo_link>
     ```
 - **Versioning:** Ensure the version is updated if republishing.
 
-### **Publishing Structure:**
+### Publishing Structure:
+
 The library will be published under your GitHub username in the registry, following this structure:
+
 ```
 username
     libraryname
@@ -59,7 +63,8 @@ username
             libraryname
 ```
 
-### **First-Time Publishing:**
+### First-Time Publishing:
+
 If you're not yet a collaborator, follow these additional steps:
 
 1. **Prepare Your Library:** Ensure it meets repository requirements and is manually prepared.
@@ -70,9 +75,7 @@ If you're not yet a collaborator, follow these additional steps:
 6. **Becoming a Collaborator:** Once approved, you'll be invited to become a collaborator, allowing direct publishing.
 7. **Publishing Future Libraries:** As a collaborator, use the `faustpublisher` tool for direct publishing.
 
-
-
-### **Commands**
+### Commands:
 
 #### `faustpublisher login`
 
@@ -90,7 +93,9 @@ EXAMPLES
 ```
 
 #### `faustpublisher publish GITHUB_LINK`
+
 Publishes your libraries to the Faust Registry.
+
 ```
 USAGE
   $ faustpublisher publish LINK
@@ -100,4 +105,24 @@ ARGUMENTS
 
 EXAMPLES
   $ faustpublisher publish https://github.com/shehab299/oscillators.lib
+```
+
+### Building the tool
+
+First time:
+
+```
+npm install
+```
+
+then:
+
+```
+npm update
+```
+
+The `package.json` has to be updated (like the `version` key), then:
+
+```
+npm run build
 ```

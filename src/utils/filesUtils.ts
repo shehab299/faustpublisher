@@ -1,8 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-
-export function isPath(directory) : boolean {
+export function isPath(directory): boolean {
     return fs.existsSync(directory);
 }
 

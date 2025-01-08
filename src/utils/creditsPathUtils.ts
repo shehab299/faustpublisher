@@ -1,9 +1,8 @@
 import os from 'os';
 import path from 'path';
-import { mkPath } from './files.util.js';
+import { mkPath } from './filesUtils.js';
 
-
-function getDefaultPath() : string {
+function getDefaultPath(): string {
 
     let defaultPath = '';
 
@@ -18,24 +17,22 @@ function getDefaultPath() : string {
     return defaultPath
 }
 
-function createFaustDir() : void {
+function createFaustDir(): void {
 
-    if(!process.env.FAUST_PATH) {
+    if (!process.env.FAUST_PATH) {
         process.env.FAUST_PATH = getDefaultPath();
     }
 
     mkPath(process.env.FAUST_PATH);
 }
 
-
-function getCreditsPath(){
+function getCreditsPath() {
     return path.join(process.env.FAUST_PATH, 'user.json');
 }
 
-function getFaustPath(){
+function getFaustPath() {
     return process.env.FAUST_PATH;
 }
-
 
 export default getCreditsPath;
 
