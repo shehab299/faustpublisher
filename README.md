@@ -17,7 +17,7 @@ The Faust community, being small due to Faust's domain-specific nature, requires
 
 Install `faustpublisher` globally using npm:
 ```bash
-npm install -g faustpublisher
+npm install -g @grame/faustpublisher
 ```
 
 ### Logging In:
@@ -109,13 +109,28 @@ EXAMPLES
 
 ### Building the tool
 
-First time:
-
 ```
 npm install
+
+npm run build
+
+npm link
+
 ```
 
-then:
+or 
+
+
+```
+npm run install-local
+```
+
+### Publishing New Version
+
+```
+npm install 
+npm run build
+```
 
 ```
 npm update
@@ -124,5 +139,7 @@ npm update
 The `package.json` has to be updated (like the `version` key), then:
 
 ```
-npm run build
+npm login 
+npm publish
 ```
+
