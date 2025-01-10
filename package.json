@@ -5,7 +5,9 @@
     "main": "index.js",
     "type": "module",
     "scripts": {
-        "build": "tsc",
+        "build": "npx tsc",
+        "install-local": "npm install && npm run build && npm link",
+        "publish": "npm build && npm login && npm publish --access public",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "repository": {
