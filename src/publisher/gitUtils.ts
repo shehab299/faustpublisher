@@ -6,7 +6,6 @@ function run(command) {
     try {
         execSync(command);
     } catch (error) {
-        console.error(error);
         throw new Errors.CLIError(`Error while trying to publish`);
     }
 }
@@ -44,6 +43,13 @@ function publishPackage(git, newVersion, branchName) {
     run(`${git} push origin ${branchName}`);
 }
 
+function publishRegistry(git, message, branchName){
+    run(`${git} add .`);
+    run(`${git} commit -m "${message}"`);
+    run(`${git} push origin ${branchName}`);
+}
+
+
 function switchToNewBranch(git, branchName) {
     run(`${git} checkout -b ${branchName}`);
 }
@@ -61,4 +67,13 @@ function downloadPackage(pkgRepo, packageName, downloadsFolder) {
     return pkgFolder;
 }
 
-export { run, getRegistryDefaultBranch, gitCmd, updateRegistry, publishPackage, downloadPackage, resetRegistry, switchToNewBranch };
+export  {run, 
+         getRegistryDefaultBranch, 
+         gitCmd, 
+         updateRegistry, 
+         publishPackage, 
+         downloadPackage, 
+         resetRegistry, 
+         switchToNewBranch, 
+         publishRegistry 
+        };

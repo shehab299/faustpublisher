@@ -3,7 +3,7 @@ import getCreditsPath, { createFaustDir, getFaustPath } from "../utils/creditsPa
 import { getToken } from "../utils/checkTokenUtils.js";
 import getUser from "../utils/getUserUtils.js";
 import checkCollaborators from "../utils/checkCollabs.js";
-import publish from "../publisher/publish.js";
+import { publish } from "../publisher/publish.js";
 
 class Publish extends Command {
 
@@ -64,7 +64,7 @@ class Publish extends Command {
         let token = await getToken(getCreditsPath());
         let user = await getUser(token);
 
-        if (!checkCollaborators(user, args.link, token))
+        if (! await checkCollaborators(user, args.link, token))
             this.error('You are not a collaborator of this repository');
 
         await publish(args.link, user, faustPath);

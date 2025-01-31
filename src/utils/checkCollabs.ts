@@ -1,25 +1,24 @@
 import axios from "axios";
 
-async function checkCollaborators(username , link, token){
+async function checkCollaborators(username: string, link: string, token: string): Promise<boolean> {
+    
+    let [_, owner, repo] = new URL(link).pathname.split('/');
 
-    let url = new URL(link);
-    let owner = url.pathname.split('/')[1];
-    let repo = url.pathname.split('/')[2];
-
-    const response = await axios({
-        method: "get",
-        url: `https://api.github.com/repos/${owner}/${repo}/collaborators/${username}`,
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    })
-
-    if(response.status === 204){
-        return true;
+    if(repo.endsWith('.git')) {
+        repo = repo.slice(0, -4);
     }
 
-    return false;
-};
+    try {
+        const response = await axios.get(`https://api.github.com/repos/${owner}/${repo}/collaborators/${username}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        return response.status === 204;
+    } catch (error) {
+        return false;
+    }
+}
 
 export default checkCollaborators;
-

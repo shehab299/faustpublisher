@@ -1,26 +1,29 @@
-import { updateRegistry, publishPackage, downloadPackage, gitCmd, switchToNewBranch, getRegistryDefaultBranch } from './gitUtils.js';
+import {
+    updateRegistry,
+    publishPackage,
+    downloadPackage,
+    gitCmd,
+    getRegistryDefaultBranch,
+    publishRegistry
+} from './gitUtils.js';
+
 import { compilePackage } from './compilerUtils.js';
 import { isPath, mkPath } from '../utils/filesUtils.js';
+import { synchronizeLibraryRegistry } from './faustlibraries.js';
 import checkCode from './checkImports.js';
-import path from 'path'
+import path from 'path';
 import { Errors } from '@oclif/core';
 import fs from 'fs';
 import getRegistryLink from '../utils/getRegistryLink.js';
 
-async function checkVersion(version, registryPath, author, packageName) {
+const SEMVER_REGEX = /^(\d+)\.(\d+)\.(\d+)$/;
 
-    const p = path.join(registryPath, author, packageName, version);
-
-    if (isPath(p)) {
-        return false;
-    }
-
-    return true;
+async function isVersionAvailable(version, registryPath, author, packageName) {
+    return !isPath(path.join(registryPath, author, packageName, version));
 }
 
-function checkVersionFormat(version): boolean {
-    const regex = new RegExp('^(\\d+)\\.(\\d+)\\.(\\d+)$');
-    return regex.test(version);
+function isValidVersionFormat(version) {
+    return SEMVER_REGEX.test(version);
 }
 
 function copyPackageToRegistry(mainfilePath, registryPath, owner, packageName, newVersion) {
@@ -29,60 +32,67 @@ function copyPackageToRegistry(mainfilePath, registryPath, owner, packageName, n
     fs.copyFileSync(mainfilePath, path.join(registryPackagePath, packageName));
 }
 
-function getRepoName(link): string {
-
-    let url = new URL(link);
-    const parts = url.pathname.split("/");
-    const repo = parts[2];
-
-    return repo;
+function extractRepoName(repoUrl) {
+    return new URL(repoUrl).pathname.split('/')[2];
 }
 
-function validateRepoName(repo: string): void {
-
-    if (repo.endsWith('.lib')) {
-        return;
+function validateRepoName(repo) {
+    if (!repo.endsWith('.lib')) {
+        throw new Errors.CLIError('Invalid Repository Name');
     }
-
-    throw new Errors.CLIError('Invalid Repository Name');
 }
 
-async function publish(pkgRepo, author, faustPath): Promise<void> {
-
-    let registryPath: string = path.join(faustPath, '.reg');
-    let downloadsFolder: string = path.join(faustPath, '.downloads');
-    let registryUrl: string = getRegistryLink();
+async function publishLibraries(faustlibrariesRepo, faustPath) {
+    const registryPath = path.join(faustPath, '.reg');
+    const downloadsFolder = path.join(faustPath, '.downloads');
+    const registryUrl = getRegistryLink();
 
     const git = gitCmd(registryPath);
-
     updateRegistry(git, registryPath, registryUrl);
+    
+    const faustlibrariesPath = downloadPackage(faustlibrariesRepo, 'faustlibraries', downloadsFolder);
+    
+    if (!await synchronizeLibraryRegistry(registryPath, faustlibrariesPath)) {
+        return false;
+    }
+    
+    publishRegistry(git, 'Synchronizing faust registry with faustlibraries', getRegistryDefaultBranch(git));
+    return true;
+}
 
-    const packageName = getRepoName(pkgRepo);
+async function publish(pkgRepo, author, faustPath) {
+    const registryPath = path.join(faustPath, '.reg');
+    const downloadsFolder = path.join(faustPath, '.downloads');
+    const registryUrl = getRegistryLink();
+
+    const git = gitCmd(registryPath);
+    updateRegistry(git, registryPath, registryUrl);
+    
+    const packageName = extractRepoName(pkgRepo);
     validateRepoName(packageName);
 
     const pkgFolder = downloadPackage(pkgRepo, packageName, downloadsFolder);
-
     const { mainfilePath, version } = await compilePackage(pkgFolder, packageName);
 
     if (!checkCode(mainfilePath)) {
-        throw new Errors.CLIError("You Are Using Non package imports which is not allowed");
+        throw new Errors.CLIError('You are using non-package imports, which is not allowed.');
     }
 
-    if (!checkVersionFormat(version)) {
-        throw new Errors.CLIError("Invalid Declared Version Format. Make sure to stick to the semver format");
+    if (!isValidVersionFormat(version)) {
+        throw new Errors.CLIError('Invalid declared version format. Use Semantic Versioning (semver).');
     }
 
-    if (! await checkVersion(version, registryPath, author, packageName)) {
-        throw new Errors.CLIError("The Version you are trying to publish already exists");
+    if (!await isVersionAvailable(version, registryPath, author, packageName)) {
+        throw new Errors.CLIError('The version you are trying to publish already exists.');
     }
 
     try {
         copyPackageToRegistry(mainfilePath, registryPath, author, packageName, version);
     } catch (err) {
-        throw new Errors.CLIError("Unexpected Error happened! please try again");
+        throw new Errors.CLIError('Unexpected error occurred while copying the package. Please try again.');
     }
 
     publishPackage(git, version, getRegistryDefaultBranch(git));
 }
 
-export default publish;
+export { publishLibraries, publish };
